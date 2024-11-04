@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noel App - Games & Tools</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #2e2e2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(to right, red, blue);
+        }
+        header h1 {
+            font-size: 2em;
+            color: #fff;
+        }
+        .container, .app {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #home.container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .box {
+            background-color: #333;
+            width: 180px;
+            height: 200px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+        .box:hover {
+            background-color: #444;
+        }
+        .icon {
+            font-size: 30px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #444;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #555;
+        }
+        /* Chatbot */
+        .chatbot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            max-width: 300px;
+            width: 100%;
+        }
+        #chat-display {
+            width: 100%;
+            height: 200px;
+            background-color: #555;
+            color: white;
+            padding: 10px;
+            overflow-y: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        #user-input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Noel App</h1>
+    </header>
+    <div id="home" class="container">
+        <div class="box" onclick="showApp('calculator')">
+            <p>Calculator</p>
+            <div class="icon">🖩</div>
+            <p>Basic Calculator</p>
+        </div>
+        <div class="box" onclick="showApp('stopwatch')">
+            <p>Stopwatch</p>
+            <div class="icon">⏱️</div>
+            <p>Measure time intervals</p>
+        </div>
+        <div class="box" onclick="showApp('number_guessing')">
+            <p>Number Guessing Game</p>
+            <div class="icon">🔢</div>
+            <p>Guess the number</p>
+        </div>
+        <div class="box" onclick="showApp('chatbot')">
+            <p>Chatbot</p>
+            <div class="icon">💬</div>
+            <p>Talk to the bot</p>
+        </div>
+        <div class="box" onclick="showApp('rock_paper_scissors')">
+            <p>Rock Paper Scissors</p>
+            <div class="icon">✊✋✌️</div>
+            <p>Player vs Computer</p>
+        </div>
+    </div>
+
+    <!-- Chatbot App -->
+    <div id="chatbot" class="app chatbot">
+        <button onclick="goBack()">Back</button>
+        <h2>Chatbot</h2>
+        <div id="chat-display"></div>
+        <input type="text" id="user-input" placeholder="Type your message..." onkeypress="if(event.key === 'Enter'){ sendMessage(); }">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        // Navigation
+        function showApp(appId) {
+            document.querySelectorAll('.container, .app').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(appId).style.display = 'flex';
+        }
+
+        // Chatbot Functions
+        const responses = {
+            "hi": "Hello! How can I help you?",
+            "how are you?": "I'm just a program, but thanks for asking!",
+            "bye": "Goodbye! Have a great day!",
+            "what is your name?": "I'm Noel's chatbot.",
+            "what do you do?": "I can answer questions and help you with the apps.",
+            "tell me a joke": "Why did the scarecrow win an award? Because he was outstanding in his field!",
+            "what's the weather like?": "I can't check the weather, but I hope it's nice!",
+            "what is 2 + 2?": "2 + 2 equals 4.",
+            "give me a fun fact": "Did you know honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old and still edible!",
+            "tell me a riddle": "What has keys but can't open locks? A piano!",
+            "what is your favorite color?": "I like all colors equally!",
+            "can you help me with math?": "Sure! What math problem do you have?",
+            "what is the capital of France?": "The capital of France is Paris.",
+            "who is the president of the USA?": "As of now, the president is Joe Biden.",
+            "what is the largest planet?": "The largest planet in our solar system is Jupiter.",
+            "tell me about the moon": "The moon is Earth's only natural satellite and is about 238,855 miles away.",
+            "what is AI?": "AI stands for Artificial Intelligence, and it refers to machines that can perform tasks that typically require human intelligence.",
+            "who wrote 'Hamlet'?": "Hamlet was written by William Shakespeare.",
+            "what is the speed of light?": "The speed of light is approximately 299,792 kilometers per second.",
+            "what are the seven wonders of the world?": "The seven wonders include the Great Wall of China, Petra, Christ the Redeemer, Machu Picchu, Chichen Itza, the Roman Colosseum, and the Taj Mahal.",
+            "what is love?": "Baby don't hurt me, don't hurt me, no more!",
+            "tell me about yourself": "I'm a simple chatbot designed to help you navigate this app.",
+            // Add more responses here
+            "what is the meaning of life?": "That's a big question! Many say it's to seek happiness and fulfillment.",
+            "do you believe in aliens?": "The universe is vast, so it's possible there are other forms of life out there!",
+            "what is your favorite movie?": "I don't watch movies, but I've heard great things about 'Inception'!",
+            "who is your favorite superhero?": "I think all superheroes are cool in their own way!",
+            "what is the best way to learn programming?": "Practice consistently, work on projects, and don't be afraid to ask for help!",
+            "can you speak another language?": "I can understand multiple languages, but I mainly respond in English.",
+            "what's your favorite book?": "I don't read books, but many people love 'To Kill a Mockingbird'.",
+            "tell me something interesting": "Octopuses have three hearts!",
+            "what is your favorite food?": "I don't eat, but I've heard pizza is very popular!",
+            "who painted the Mona Lisa?": "The Mona Lisa was painted by Leonardo da Vinci.",
+            "how tall is Mount Everest?": "Mount Everest is 8,848.86 meters (29,031.7 feet) tall.",
+            "what is a black hole?": "A black hole is a region of space where gravity is so strong that nothing, not even light, can escape.",
+            "what's the difference between weather and climate?": "Weather is short-term atmospheric conditions, while climate is the average of those conditions over a long period.",
+            "what is a smartphone?": "A smartphone is a handheld device that combines mobile phone capabilities with advanced computing features.",
+            "who is the author of '1984'?": "The author of '1984' is George Orwell.",
+            "what is the tallest building in the world?": "As of now, the tallest building is the Burj Khalifa in Dubai.",
+            "what is the currency of Japan?": "The currency of Japan is the Yen.",
+            "what's your favorite holiday?": "I don't celebrate holidays, but many enjoy Christmas!",
+            "how do you make a cake?": "To make a cake, you usually mix flour, sugar, eggs, and baking powder, then bake in an oven!",
+            "what is your favorite game?": "I think all games are fun in their own way!",
+            "what's the best way to stay healthy?": "Eating well and exercising regularly are great ways to stay healthy!",
+            "what is meditation?": "Meditation is a practice where an individual uses a technique to train attention and awareness.",
+            "who discovered penicillin?": "Penicillin was discovered by Alexander Fleming.",
+            "what is quantum physics?": "Quantum physics studies the behavior of matter and energy at the smallest scales.",
+            "what is the primary language spoken in Brazil?": "The primary language spoken in Brazil is Portuguese.",
+            "how many continents are there?": "There are seven continents: Africa, Antarctica, Asia, Europe, North America, Australia, and South America.",
+            "what is blockchain?": "Blockchain is a system of recording information in a way that makes it difficult to change or hack.",
+            "what are the basic needs of humans?": "Humans generally need food, water, shelter, and safety to survive.",
+            "what is the ocean?": "The ocean is a large body of salt water that covers most of the Earth’s surface.",
+            "what's the best way to learn a new language?": "Immersion and practice with native speakers can be very effective!",
+            "who is the Greek god of the sea?": "The Greek god of the sea is Poseidon.",
+            "what is a virus?": "A virus is a tiny infectious agent that can only replicate inside the living cells of an organism.",
+            "how do plants grow?": "Plants grow by taking in sunlight, water, and nutrients from the soil.",
+            "what is renewable energy?": "Renewable energy comes from sources that are naturally replenished, like solar or wind power.",
+            "what is the primary function of the brain?": "The brain controls thoughts, memories, feelings, and all the processes that regulate the body.",
+            "who invented the telephone?": "The telephone was invented by Alexander Graham Bell.",
+            "what is a comet?": "A comet is a small solar system body that, when passing close to the Sun, heats up and begins to release gases.",
+            "what is gravity?": "Gravity is a natural phenomenon by which all things with mass are brought toward one another.",
+            "what are clouds made of?": "Clouds are made of tiny water droplets or ice crystals.",
+            "how does photosynthesis work?": "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the help of chlorophyll.",
+            "what is an ecosystem?": "An ecosystem is a community of living organisms and their physical environment interacting as a system.",
+            "who is considered the father of modern physics?": "Albert Einstein is often called the father of modern physics.",
+            "what is the periodic table?": "The periodic table is a table of the chemical elements arranged by atomic number.",
+            "what is a noun?": "A noun is a part of speech that represents a person, place, thing, or idea.",
+            "what is a verb?": "A verb is a part of speech that describes an action, occurrence, or state of being.",
+            "what is an adverb?": "An adverb is a part of speech that modifies a verb, an adjective, or another adverb.",
+            "what is a pronoun?": "A pronoun is a word that takes the place of a noun.",
+            "what is a metaphor?": "A metaphor is a figure of speech that refers to one thing by mentioning another.",
+            "what is a simile?": "A simile is a figure of speech that compares two different things using 'like' or 'as'.",
+            "what is a haiku?": "A haiku is a traditional form of Japanese poetry consisting of three lines.",
+            "who is the main character in 'Harry Potter'?": "The main character in 'Harry Potter' is Harry Potter himself.",
+            "what is the significance of the pyramids?": "The pyramids are ancient monuments built as tombs for pharaohs in ancient Egypt.",
+            "what is a democracy?": "Democracy is a system of government in which the citizens exercise power directly or elect representatives.",
+            "what is a monarchy?": "Monarchy is a form of government with a monarch at the head.",
+            "what is the difference between a simile and a metaphor?": "A simile compares two different things using 'like' or 'as', while a metaphor states one thing is another.",
+            "what is the longest river in the world?": "The longest river in the world is the Nile River.",
+            "what is the most spoken language in the world?": "The most spoken language in the world is English.",
+            "what is the human body made of?": "The human body is made of cells, tissues, organs, and systems.",
+            "how do you cook rice?": "To cook rice, rinse it, then boil it in water or broth until tender.",
+            "what is a smartphone app?": "A smartphone app is a software application designed to run on smartphones.",
+            "what is artificial intelligence?": "Artificial intelligence refers to the simulation of human intelligence in machines.",
+            "what is a supernova?": "A supernova is a powerful and luminous explosion of a star.",
+            "who discovered America?": "Christopher Columbus is credited with discovering America in 1492.",
+            "what is the Great Wall of China?": "The Great Wall of China is a series of fortifications built to protect Chinese states.",
+            "what is a galaxy?": "A galaxy is a system of stars, stellar remnants, interstellar gas, dust, and dark matter.",
+            "what is a smartphone?": "A smartphone is a mobile phone that includes advanced features.",
+            "what is a game console?": "A game console is a device that connects to a TV and is used to play video games.",
+            "what is a website?": "A website is a collection of web pages located under a single domain.",
+            "what is a search engine?": "A search engine is a software system that is designed to carry out web searches.",
+            "what is a database?": "A database is an organized collection of data, generally stored and accessed electronically.",
+            "who is a famous scientist?": "Albert Einstein is one of the most famous scientists known for his theory of relativity.",
+            "what is the purpose of education?": "The purpose of education is to impart knowledge, skills, and critical thinking to students.",
+            "how do you build a house?": "To build a house, you need to plan, obtain materials, and follow building codes.",
+            "what is renewable energy?": "Renewable energy comes from sources that are naturally replenished, like solar or wind energy.",
+            "how do you change a tire?": "To change a tire, loosen the lug nuts, jack up the car, remove the flat tire, replace it with a spare, and tighten the lug nuts.",
+            "how does the internet work?": "The internet works by connecting computers and devices worldwide using protocols for communication.",
+            "what is a computer virus?": "A computer virus is a malicious program that can replicate itself and spread to other computers.",
+            "what is cybersecurity?": "Cybersecurity refers to the practice of protecting systems, networks, and programs from digital attacks.",
+            "who is the CEO of Tesla?": "As of now, the CEO of Tesla is Elon Musk."
+        };
+
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            const chatDisplay = document.getElementById('chat-display');
+            chatDisplay.innerHTML += `<div>User: ${userInput}</div>`;
+            document.getElementById('user-input').value = '';
+            const botResponse = responses[userInput.toLowerCase()] || responses["default"];
+            chatDisplay.innerHTML += `<div>Bot: ${botResponse}</div>`;
+            chatDisplay.scrollTop = chatDisplay.scrollHeight; // Scroll to bottom
+        }
+
+        // Go back to home
+        function goBack() {
+            document.querySelectorAll('.container, .app').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById('home').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
